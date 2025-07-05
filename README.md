@@ -41,7 +41,7 @@ The baseline detection helps eliminate false positives by identifying the server
 
 ### From Source
 ```bash
-git clone <repository-url>
+git clone https://github.com/cypherguard/vhunter.git
 cd vhunter
 go build -o vhunter vhunter.go
 ```
