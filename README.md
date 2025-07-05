@@ -143,4 +143,4 @@ If you encounter any issues or have questions:
 
 ---
 
-⭐ **If you find VHunter useful, please consider giving it a star!** ⭐
+
