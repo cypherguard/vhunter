@@ -1,146 +1,151 @@
-# 🎯 VHunter v1.1
+# vhunter v1.1
 
-![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)
-![Version](https://img.shields.io/badge/Version-1.1-blue?style=for-the-badge)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+```
+																				
+   .   , .           .                  
+   |  /  |           |                  
+   | /   |-. . . ;-. |-  ,-. ;-.        
+   |/    | | | | | | |   |-' |          
+   '     ' ' `-` ' ' `-' `-' '    v1.1
+  @cypherguard                        
+```
 
-> 🚀 **Fast and efficient virtual host discovery tool written in Go**
+🎯 A fast and efficient virtual host (vhost) discovery tool written in Go. vhunter helps security researchers and penetration testers discover virtual hosts by bruteforcing hostnames against a target server.
 
-VHunter is a powerful command-line tool designed for virtual host enumeration and discovery. It performs concurrent HTTP requests with custom Host headers to identify hidden virtual hosts on web servers.
+## ✨ Features
 
-## Features
+- ⚡ **Fast Multi-threaded Scanning**: Configurable number of concurrent threads
+- 🎯 **Baseline Detection**: Automatically detects and filters out default/baseline responses
+- 🔧 **Flexible Filtering**: Filter by status codes, response size, or keywords
+- 🚦 **Rate Limiting**: Built-in rate limiting to avoid overwhelming targets
+- 📊 **Multiple Output Formats**: Console output with colored results and optional file output
+- 🌐 **HTTP Method Support**: Supports different HTTP methods (GET, POST, etc.)
+- 🔒 **TLS Support**: Handles HTTPS targets with configurable TLS settings
+## 🎯 Baseline Detection
 
-- **⚡ Concurrent Processing**: Multi-threaded architecture for high-speed virtual host enumeration
-- **🎯 Intelligent Baseline Detection**: Automated false positive filtering through baseline response comparison
-- **🔧 Advanced Filtering Options**: Comprehensive status code and response size filtering capabilities
-- **📊 Real-time Progress Monitoring**: Live scan progress with detailed status code statistics
-- **🌐 Protocol Flexibility**: Support for multiple HTTP methods (GET, POST, PUT, DELETE, etc.)
-- **🚦 Traffic Control**: Built-in rate limiting to ensure responsible scanning practices
-- **📈 Performance Optimization**: Configurable timeout and thread management for optimal performance
-- **📋 Comprehensive Reporting**: Detailed output with file export capabilities for further analysis
-- **🎨 Enhanced User Experience**: Color-coded terminal output with professional formatting
+vhunter automatically detects baseline responses by:
+- 🎲 Generating random hostnames and sending requests
+- 📊 Analyzing response patterns (status code, title, server headers)
+- 🔍 Filtering out responses that match baseline signatures
+- ⚙️ Configurable number of baseline requests (3-10, recommended 5-7 for accuracy)
 
-## 🛠️ Installation
+The baseline detection helps eliminate false positives by identifying the server's default response pattern.
 
-### Prerequisites
-- Go 1.19 or higher
+## 🚀 Performance Tips
 
-### Build from Source
+- 🧵 **Threads**: Start with 10-20 threads, increase gradually based on target capacity
+- 🐌 **Rate Limiting**: Use 5-10 requests/second for stealthy scanning
+- ⏰ **Timeout**: Adjust timeout based on target response time
+- 📊 **Baseline Requests**: Use 5-7 baseline requests for better accuracy
+## 📥 Installation
+
+### From Source
 ```bash
-git clone https://github.com/cypherguard/vhunter.git
+git clone <repository-url>
 cd vhunter
 go build -o vhunter vhunter.go
 ```
 
-### Download Binary
-Check the [Releases](https://github.com/cypherguard/vhunter/releases) page for pre-compiled binaries.
+### Direct Run
+```bash
+go run vhunter.go [options]
+```
+
+### 📦 Download Binary
+Download the latest pre-compiled binary from the [releases page](https://github.com/your-username/vhunter/releases)
 
 ## 🚀 Usage
 
 ### Basic Usage
 ```bash
-./vhunter -u target.com -w wordlist.txt
+./vhunter -u http://example.com -w wordlist.txt
 ```
 
-### Advanced Usage
+
+## ⚙️ Command Line Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `-u` | Target URL (required) | - |
+| `-w` | Path to vhost wordlist (required) | - |
+| `-t` | Number of threads | 10 |
+| `-X` | HTTP method to use | GET |
+| `-timeout` | Request timeout in seconds | 5 |
+| `-rate` | Requests per second (0 = unlimited) | 0 |
+| `-fc` | Ignore these status codes (e.g., 403,404) | - |
+| `-sc` | Only show these status codes (overrides -fc) | - |
+| `-fs` | Filter out responses by exact size (bytes) | 0 |
+| `-o` | Output file to write results | - |
+| `-bc` | Number of baseline requests (3-10) | 3 |
+| `-bk` | Ignore responses containing this keyword | - |
+| `-v` | Verbose mode (print all matches) | false |
+| `-h` | Show help message | false |
+
+## 💡 Examples
+
+### 🔍 Basic Virtual Host Discovery
 ```bash
-./vhunter -u https://target.com -w wordlist.txt -t 20 -o results.txt -v
+./vhunter -u http://target.com -w common-vhosts.txt
 ```
-
-## 📋 Command Line Options
-
-| Flag | Description | Default |
-|------|-------------|---------|
-| `-u`  |  Target IP or domain (required)
-| `-w`  |  Path to vhost wordlist (required) 
-| `-t`  |  Number of concurrent threads |   10 |
-| `-fc` |  Comma-separated response codes to ignore 
-| `-sc` |  Comma-separated response codes to ONLY show
-| `-fs` |  Filter out responses with exact body size (bytes)
-| `-rate` |  Requests per second rate limit (0 = unlimited) 
-| `-timeout` |  HTTP client timeout in seconds |   5 |
-| `-X`  |  HTTP method to use (GET, POST, etc.) | GET |
-| `-o`  |  Output file to save matched results 
-| `-v`  |  Verbose mode: print each matched vhost 
-| `-h`  |  Show help message 
-
-##  Examples
-
-### Basic Virtual Host Discovery
+### 📝 Use POST Method with Custom Baseline
 ```bash
-./vhunter -u example.com -w subdomains.txt
+./vhunter -u https://api.target.com -w api-endpoints.txt -X POST -bc 7
 ```
 
-### Filter Out Common False Positives
+### 🔤 Ignore Responses with Specific Keywords
 ```bash
-./vhunter -u example.com -w subdomains.txt -fc 404,403
+./vhunter -u http://target.com -w wordlist.txt -bk "not found"
 ```
+## 📊 Output Format
+- 🎨 **Colored Status Codes**: 
+  - 🟢 Green (2xx): Successful responses
+  - 🟡 Yellow (3xx): Redirects
+  - 🔴 Red (4xx/5xx): Client/Server errors
+- 📈 **Real-time Progress**: Shows current progress and status code distribution
+- 📋 **Result Summary**: Final count of responses by status code
 
-### Show Only Successful Responses
-```bash
-./vhunter -u example.com -w subdomains.txt -sc 200,301,302
+### 📁 File Output
+Plain text format suitable for further processing:
 ```
-
-### High-Speed Scanning with Rate Limiting
-```bash
-./vhunter -u example.com -w subdomains.txt -t 50 -rate 100
+[200] admin.target.com size: 1024 bytes
+[301] dev.target.com size: 512 bytes
+[200] api.target.com size: 2048 bytes
 ```
+## 🔒 Security Considerations
 
-### Save Results to File
-```bash
-./vhunter -u example.com -w subdomains.txt -o discovered_vhosts.txt
-```
+- ✅ Always obtain proper authorization before scanning
+- 🚦 Use appropriate rate limiting to avoid DoS conditions
+- ⚖️ Be aware of legal and ethical implications
+- 🔐 Consider using VPN or proxy for anonymity
+- 👀 Monitor your scanning to avoid overwhelming the target
+- 🛡️ Some targets may have intrusion detection systems
 
-### POST Method with Custom Settings
-```bash
-./vhunter -u example.com -w subdomains.txt -X POST -timeout 10 -v
-```
+## 🛠️ Troubleshooting
 
-##  Output Format
+### ❗ Common Issues
 
-VHunter provides colored output for better readability:
+**"Connection refused" errors**:
+- 🔗 Check if the target URL is accessible
+- 🌐 Verify the protocol (HTTP vs HTTPS)
+- 🔥 Check firewall/network restrictions
 
-- 🟢 **Green** (2xx): Successful responses
-- 🟡 **Yellow** (3xx): Redirection responses  
-- 🔴 **Red** (4xx-5xx): Client/Server errors
+**Too many false positives**:
+- 📊 Increase baseline requests with `-bc 7`
+- 📏 Use response size filtering with `-fs`
+- 🔤 Add keyword filtering with `-bk`
 
-Example output:
-```
-[200] admin.example.com size: 2048 bytes
-[301] api.example.com size: 156 bytes
-[403] secure.example.com size: 1024 bytes
-```
+## 📄 License
 
+This project is licensed under the MIT License - see the LICENSE file for details.
 
+## 👨‍💻 Author
 
-## 📊 Performance Tips
+**@cypherguard**
 
-- **Threads**: Increase `-t` for faster scanning (be mindful of target server limits)
-- **Rate Limiting**: Use `-rate` to avoid triggering rate limits or WAF
-- **Size Filtering**: Use `-fs` to filter out common response sizes
-- **Code Filtering**: Use `-fc` or `-sc` to focus on relevant responses
+## ⚠️ Disclaimer
 
-##  Responsible Usage
-
--  Only test on systems you own or have explicit permission to test
--  Respect rate limits and server resources
--  Follow responsible disclosure practices
--  Use appropriate rate limiting in production environments
-
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Inspired by various virtual host discovery tools
-
-##  Support
-
-If you encounter any issues or have questions:
-- 🐛 [Open an issue](https://github.com/cypherguard/vhunter/issues)
-- 💬 [Start a discussion](https://github.com/cypherguard/vhunter/discussions)
+This tool is for educational and authorized security testing purposes only. Users are responsible for complying with applicable laws and regulations. The author is not responsible for any misuse of this tool.
 
 ---
 
-
+**🚨 Important**: Always ensure you have proper authorization before testing any systems you do not own. Unauthorized scanning may be illegal in your jurisdiction.
